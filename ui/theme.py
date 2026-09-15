@@ -52,6 +52,9 @@ CLASS_COLORS = {
     "DoS": RUBY,
     "Brake Tampering": GOLD,
     "Steering Tampering": AMETHYST,
+    # Not a dataset class: what the anomaly gate can honestly say about traffic
+    # that deviates from learnt-normal but carries no label the model was taught.
+    "Unknown Anomaly": SAPPHIRE,
 }
 
 PLOTLY_LAYOUT = dict(
@@ -371,6 +374,111 @@ div[data-testid="stSelectbox"] label, div[data-testid="stSlider"] label, .stRadi
     width: 3px; height: 17px; border-radius: 2px;
     background: linear-gradient(180deg, {GOLD_BRIGHT}, {GOLD_DEEP});
 }}
+
+/* ============================ model comparison board ============================ */
+.ts-board {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+             gap: .7rem; margin: .2rem 0 .3rem 0; }}
+@media (max-width: 1100px) {{ .ts-board {{ grid-template-columns: repeat(2, minmax(0,1fr)); }} }}
+.ts-model {{
+    border: 1px solid {BORDER}; border-radius: 16px; padding: .95rem 1rem 0.85rem 1rem;
+    background: linear-gradient(180deg, #FFFFFF, #FDFBF6); position: relative;
+    box-shadow: 0 1px 2px rgba(19,28,51,0.04), 0 8px 22px rgba(19,28,51,0.05);
+    transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+    overflow: hidden;
+}}
+.ts-model .tag {{
+    font-size: .58rem; letter-spacing: .16em; text-transform: uppercase;
+    font-weight: 800; color: {MUTED};
+}}
+.ts-model .nm {{
+    font-family: 'Sora', sans-serif; font-size: 1.02rem; font-weight: 700;
+    color: {INK}; margin-top: .12rem; letter-spacing: -.02em;
+}}
+.ts-model .verdict {{
+    margin-top: .7rem; font-family: 'Sora', sans-serif; font-weight: 800;
+    font-size: .96rem; letter-spacing: -.01em; display: flex; align-items: center;
+    gap: .4rem; line-height: 1.25;
+}}
+.ts-model .meta {{ font-size: .745rem; color: {MUTED}; margin-top: .3rem; line-height: 1.5;
+                   min-height: 2.2em; }}
+.ts-model .bar {{
+    height: 5px; border-radius: 3px; background: rgba(19,28,51,.08);
+    margin-top: .55rem; overflow: hidden;
+}}
+.ts-model .bar i {{ display: block; height: 100%; border-radius: 3px;
+                    background: {MUTED}; transition: width .25s ease; }}
+.ts-model .foot {{
+    margin-top: .6rem; padding-top: .55rem; border-top: 1px solid rgba(19,28,51,.075);
+    font-size: .715rem; color: {MUTED}; display: flex; justify-content: space-between;
+    gap: .4rem; align-items: baseline;
+}}
+.ts-model .foot b {{ color: {INK}; font-weight: 700; }}
+
+/* live state: this model is alarming on the frame being processed */
+.ts-model.on {{ border-color: rgba(190,47,60,.45);
+                background: linear-gradient(180deg, rgba(190,47,60,.09), #FFFFFF);
+                box-shadow: 0 10px 28px rgba(190,47,60,.16); transform: translateY(-2px); }}
+.ts-model.on .verdict {{ color: {RUBY}; }}
+.ts-model.on .bar i {{ background: {RUBY}; }}
+.ts-model.quiet .verdict {{ color: {EMERALD}; }}
+.ts-model.quiet .bar i {{ background: {EMERALD}; }}
+
+/* verdict against ground truth, once the attack segment has played */
+.ts-model .mark {{
+    position: absolute; top: .8rem; right: .85rem; font-size: .95rem; font-weight: 800;
+}}
+.ts-model.hit {{ border-color: rgba(18,119,90,.45); }}
+.ts-model.hit .mark {{ color: {EMERALD}; }}
+.ts-model.hit .verdict {{ color: {EMERALD}; }}
+.ts-model.missed {{ border-color: rgba(190,47,60,.45); }}
+.ts-model.missed .mark {{ color: {RUBY}; }}
+/* A model that stayed quiet through the attack reads as a miss, not as calm:
+   these two rules sit after .quiet so they win on a card that is not alarming. */
+.ts-model.missed .verdict {{ color: {RUBY}; }}
+.ts-model.missed .bar i {{ background: {RUBY}; }}
+.ts-model.missed::after {{
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(180deg, rgba(190,47,60,.055), transparent 55%);
+}}
+
+/* the proposed model carries a gold rail so it reads apart from the baselines */
+.ts-model.proposed {{ border-color: {BORDER_GOLD}; }}
+.ts-model.proposed::before {{
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: linear-gradient(180deg, {GOLD_BRIGHT}, {GOLD_DEEP});
+}}
+.ts-model.proposed .tag {{ color: {GOLD_DEEP}; }}
+
+/* the gate readout, only on the proposed card */
+.ts-gate {{
+    margin-top: .55rem; font-size: .7rem; color: {MUTED};
+    background: rgba(42,75,168,.055); border: 1px solid rgba(42,75,168,.16);
+    border-radius: 9px; padding: .42rem .55rem; line-height: 1.5;
+}}
+.ts-gate b {{ color: {SAPPHIRE}; }}
+.ts-gate.fired {{ background: rgba(42,75,168,.13); border-color: rgba(42,75,168,.38); }}
+
+/* ============================ case picker + scoreboard ============================ */
+.ts-case {{
+    border: 1px solid {BORDER}; border-radius: 15px; padding: .85rem 1rem;
+    background: #FFFFFF; font-size: .8rem; color: {MUTED}; line-height: 1.55;
+}}
+.ts-case.active {{ border-color: {BORDER_GOLD}; background: linear-gradient(180deg,
+                   rgba(169,130,47,.09), #FFFDF6); }}
+.ts-case .t {{ font-family: 'Sora', sans-serif; font-weight: 700; color: {INK};
+               font-size: .88rem; display: block; margin-bottom: .2rem; }}
+.ts-score {{
+    border-radius: 16px; padding: 1.1rem 1.3rem; border: 1px solid;
+    font-size: .92rem; line-height: 1.7;
+}}
+.ts-score .hl {{ font-family: 'Sora', sans-serif; font-weight: 800; font-size: 1.12rem;
+                 display: block; margin-bottom: .3rem; }}
+.ts-score.win {{ background: linear-gradient(180deg, rgba(18,119,90,.10), #FFFFFF);
+                 border-color: rgba(18,119,90,.34); }}
+.ts-score.win .hl {{ color: {EMERALD}; }}
+.ts-score.flat {{ background: linear-gradient(180deg, rgba(176,122,12,.10), #FFFDF6);
+                  border-color: rgba(176,122,12,.34); }}
+.ts-score.flat .hl {{ color: {AMBER}; }}
 </style>
 """
 

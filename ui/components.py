@@ -5,7 +5,7 @@ from typing import Dict, List, Optional, Sequence, Tuple
 
 import streamlit as st
 
-from .theme import CLASS_COLORS, GREEN, MUTED, RED, TEXT
+from .theme import CLASS_COLORS, GREEN, MUTED, TEXT
 
 # (icon, name, one-line explanation) -- the story the judge reads in 10 seconds.
 PIPELINE: List[Tuple[str, str, str]] = [
@@ -13,7 +13,8 @@ PIPELINE: List[Tuple[str, str, str]] = [
     ("🧠", "Digital Twin", "Predicts expected CAN behaviour"),
     ("⚡", "Residual", "Measures deviation from expected"),
     ("🔗", "Adaptive Fusion", "Combines evidence across ECU streams"),
-    ("🤖", "CNN-BiLSTM", "Classifies normal and malicious traffic"),
+    ("🤖", "CNN-BiLSTM", "Names the attacks it was trained on"),
+    ("🛡️", "Anomaly Gate", "Flags deviation carrying no known label"),
     ("🚨", "Detection", "Raises the alert and its confidence"),
     ("🔍", "Explanation", "Shows why the model decided"),
 ]
@@ -125,3 +126,70 @@ def note(text: str) -> None:
 
 def flag(text: str) -> None:
     st.markdown(f'<div class="ts-flag">{text}</div>', unsafe_allow_html=True)
+
+
+# ---------------------------------------------------------------------------
+# Four-model comparison board -- the centrepiece of the Live Monitor
+# ---------------------------------------------------------------------------
+def model_board(cards: Sequence[Dict]) -> None:
+    """Side-by-side live verdicts for every model in the comparison.
+
+    Each entry is a dict:
+        name       model name
+        tag        'BASELINE' / 'PROPOSED'
+        proposed   bool -- draws the gold rail
+        alarming   bool -- is this model alerting on the frame just processed
+        verdict    headline text
+        meta       one line under the headline
+        conf       0..1, drives the bar
+        alarms     alarms raised so far
+        frames     frames replayed so far
+        mark       '' | 'hit' | 'missed' -- verdict against ground truth
+        caught     alarms raised on frames whose true class is the case's attack
+        target     how many such frames have been revealed, and its name
+        false      alarms raised on frames whose true class is Normal
+        gate       optional HTML for the anomaly-gate readout
+        gate_fired bool
+
+    The footer deliberately reports false alarms next to catches.  A detector
+    that alarms on everything would score a perfect catch rate, so a catch
+    count shown on its own is not a result.
+    """
+    parts = ['<div class="ts-board">']
+    for c in cards:
+        cls = "ts-model"
+        if c.get("proposed"):
+            cls += " proposed"
+        cls += " on" if c.get("alarming") else " quiet"
+        mark = c.get("mark", "")
+        if mark:
+            cls += f" {mark}"
+        glyph = {"hit": "✓", "missed": "✗"}.get(mark, "")
+        gate = ""
+        if c.get("gate"):
+            gcls = "ts-gate fired" if c.get("gate_fired") else "ts-gate"
+            gate = f'<div class="{gcls}">{c["gate"]}</div>'
+        parts.append(
+            f'<div class="{cls}">'
+            f'<span class="mark">{glyph}</span>'
+            f'<div class="tag">{c.get("tag", "")}</div>'
+            f'<div class="nm">{c["name"]}</div>'
+            f'<div class="verdict">{c["verdict"]}</div>'
+            f'<div class="meta">{c.get("meta", "")}</div>'
+            f'<div class="bar"><i style="width:{max(0.0, min(1.0, c.get("conf", 0.0)))*100:.0f}%"></i></div>'
+            f'{gate}'
+            f'<div class="foot"><span>caught</span>'
+            f'<span><b>{c.get("caught", 0)}</b> / {c.get("target", 0)} '
+            f'{c.get("target_name", "attack")}</span></div>'
+            f'<div class="foot" style="border-top:none;padding-top:0;margin-top:.15rem">'
+            f'<span>false alarms</span>'
+            f'<span><b>{c.get("false", 0)}</b> / {c.get("normal", 0)} normal</span></div>'
+            f'</div>')
+    parts.append("</div>")
+    st.markdown("".join(parts), unsafe_allow_html=True)
+
+
+def scoreboard(headline: str, body: str, tone: str = "win") -> None:
+    """Closing verdict strip under the replay. `tone` is 'win' or 'flat'."""
+    st.markdown(f'<div class="ts-score {tone}"><span class="hl">{headline}</span>'
+                f'{body}</div>', unsafe_allow_html=True)

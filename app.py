@@ -28,8 +28,7 @@ inject()
 PAGES = [
     ("Overview", "🛡️", "pages/01_Overview.py"),
     ("Live Monitor", "🚗", "pages/02_Live_Monitor.py"),
-    ("Digital Twin", "🧠", "pages/03_Digital_Twin.py"),
-    ("Results", "📊", "pages/04_Results.py"),
+    ("Results", "📊", "pages/03_Results.py"),
 ]
 
 pages = [
@@ -44,7 +43,7 @@ nav = st.navigation(pages, position="hidden")
 
 
 def navbar(active_title: str) -> None:
-    brand, *slots = st.columns([2.0, 1, 1, 1, 1, 0.9], vertical_alignment="center")
+    brand, *slots = st.columns([2.2, 1, 1, 1, 1.1], vertical_alignment="center")
     with brand:
         st.markdown('<div class="ts-brand">🛡️ <b class="mark">TwinShield-Fusion</b></div>',
                     unsafe_allow_html=True)
