@@ -183,3 +183,81 @@ How far each script was actually exercised, so you know what to watch for:
 
 A synthetic capture exercises the code paths. It cannot tell you whether a
 baseline beats your method on your data — only your run can do that.
+
+---
+
+## 6. Draft text for the new results, ready to fill
+
+When `extra_baselines.py` and `loao_sweep.py` have run, these go into the paper.
+Every number is a slot marked `__` — fill them from the scripts' own output and
+change nothing else. If a sentence turns out to be false on your data, change the
+sentence, not the number.
+
+### 6.1 New subsection for Section VI, after VI-B
+
+> **C. UNSUPERVISED AND OPEN-SET BASELINES**
+>
+> The comparison in Section VI-B is between four supervised architectures, only
+> one of which has a second channel. That is not the comparison a reader should
+> accept, because it leaves open whether the gate earns its place or whether any
+> unsupervised detector would do. Table VI answers it. Every row is fitted on
+> normal traffic from the same quarantined training split, and every row with a
+> threshold is calibrated the same way the gate is: on held-out normal validation
+> frames at a one per cent target false-positive rate, with no attack frame of any
+> class taking part.
+>
+> *[Table VI here: Detector / Detected / False alarms, from extra_baselines.py]*
+>
+> The per-identifier range check is the row that matters most, because it is the
+> cheapest thing that could work: it flags a payload byte never seen on that
+> identifier in training, and it has no parameters at all. It detects __% of the
+> quarantined class at __% false alarms. [If it detects most of them:] On this
+> attack, that simple test is competitive with the digital twin, and the twin's
+> advantage is therefore not that it detects brake tampering but that it does so
+> __. [If it does not:] The forged bytes evidently fall inside the per-identifier
+> range often enough that a static bound misses __% of them, which is what the
+> learnt per-byte distribution adds.
+>
+> The isolation forest and the autoencoder operate on the same frame features as
+> the supervised baselines and detect __% and __% respectively. The twin residual
+> acting alone, with the supervised head removed entirely, detects __%, which is
+> consistent with the decomposition in Section VI-B attributing the whole of the
+> detection to the gate.
+>
+> The two open-set rules read off the supervised baselines detect between __% and
+> __%. A softmax trained on k classes assigns an out-of-set attack to whichever of
+> them fits least badly, and thresholding its confidence does not recover what the
+> label space never contained.
+
+### 6.2 Replacement for the Table V paragraph, once the sweep has run
+
+> Table V reports one quarantined class at one seed. Table VII repeats the
+> experiment for every attack class the dataset supports, across __ seeds, and
+> reports the mean with a 95 per cent interval. [Then one of:] The ordering in
+> Table V holds across seeds and classes, with intervals that do not overlap
+> between TwinShield-Fusion and the strongest baseline. / The ordering holds for
+> __ but not for __, where the intervals overlap and no claim of separation is
+> supportable.
+
+### 6.3 Sentence for Section VI-C, once bus_rate.py has run
+
+> At the __ frames per second this capture sustains on average, a 2.26 per cent
+> false-positive rate is __ alarms per second.
+
+### 6.4 If the second dataset runs
+
+> **D. A SECOND CAPTURE**
+>
+> [Dataset name] was converted to the same frame schema and the same protocol
+> applied, with __ quarantined. [Result.] The classes in that dataset are not the
+> classes in GEM-CAN, and the mapping used is recorded with the converted data;
+> the slot names in our code are ours, and the attacks they stand for are
+> [dataset]'s.
+
+### A note on how to use these
+
+Write the result you get, not the result you wanted. Two of these drafts have an
+if/else because I do not know which way your data will fall, and the paper is
+stronger for choosing the branch honestly than for quietly picking the flattering
+one. A reviewer who already suspects the baselines were skipped will read a
+suspiciously clean table as confirmation.
