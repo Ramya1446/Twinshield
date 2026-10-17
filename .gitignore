@@ -13,3 +13,10 @@ __pycache__/
 venv/
 .streamlit/secrets.toml
 .DS_Store
+
+# experiment outputs: these are measurements, never checked in, so that
+# nothing in the repository can be mistaken for a result someone produced
+results/loao_runs/
+results/loao_sweep.json
+results/bus_rate.json
+results/extra_baselines.json
