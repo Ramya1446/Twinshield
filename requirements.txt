@@ -5,4 +5,5 @@ scikit-learn>=1.4
 streamlit>=1.40
 plotly>=5.20
 shap>=0.45
+matplotlib>=3.8          # report/ figure scripts only
 torch>=2.2

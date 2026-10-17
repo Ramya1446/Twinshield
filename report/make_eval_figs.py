@@ -22,10 +22,17 @@ import argparse
 import os
 import sys
 
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import numpy as np
+
+try:
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+except ImportError:                                   # the one dependency the
+    raise SystemExit(                                 # app itself never needed
+        "matplotlib is not installed, which is the usual reason this script "
+        "will not run.\n\n    pip install matplotlib\n\nthen try again.")
+
 from sklearn.metrics import (auc, average_precision_score, confusion_matrix,
                              precision_recall_curve, roc_curve)
 
@@ -194,7 +201,23 @@ def main():
     ap.add_argument("--saved", default=os.path.join(HERE, "..", "saved_models"))
     ap.add_argument("--out", default=os.path.join(HERE, "figures"))
     ap.add_argument("--variant", default="with_id", choices=["with_id", "no_id"])
+    ap.add_argument("--dump", action="store_true",
+                    help="write eval_data_<variant>.npz and stop, for plotting "
+                         "elsewhere")
     args = ap.parse_args()
+
+    if args.dump:
+        # for the case where the figures have to be drawn somewhere else: this
+        # writes the two arrays the three figures are computed from, and nothing
+        # else from the capture.
+        pr = os.path.join(args.saved, f"{args.variant}__twinshield_test_proba.npy")
+        p = prepare()
+        out = os.path.join(HERE, f"eval_data_{args.variant}.npz")
+        np.savez_compressed(out, y_true=p.windows.y[p.idx("test")],
+                            proba=np.load(pr))
+        print("wrote", out, "-- send this file on; it holds labels and "
+              "probabilities only.")
+        return
 
     proba_path = os.path.join(args.saved, f"{args.variant}__twinshield_test_proba.npy")
     if not os.path.exists(proba_path):
