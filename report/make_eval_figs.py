@@ -2,6 +2,7 @@
 """
 Build the classifier-diagnostic figures for the report: a confusion matrix,
 one-vs-rest ROC curves and precision-recall curves.
+These are Figures 6.9, 6.10 and 6.11 of Section 6.13.
 
 Everything is computed from the test-split probabilities your own training run
 saved, so the figures cannot disagree with the tables beside them.
@@ -103,7 +104,7 @@ def fig_confusion(y_true, y_pred, names, out, tag):
     ax.set_yticks(np.arange(-0.5, len(names), 1), minor=True)
     ax.grid(which="minor", color="white", linewidth=2.0)
     ax.tick_params(which="minor", length=0)
-    save(fig, out, f"fig6_6_confusion{tag}.png")
+    save(fig, out, f"fig6_9_confusion{tag}.png")
 
     print("\n  Confusion matrix (rows: true class, columns: predicted)")
     print("    {:<20}".format("") + "".join(f"{n[:10]:>12}" for n in names) + f"{'support':>10}")
@@ -145,7 +146,7 @@ def fig_roc(y_true, proba, names, out, tag):
     for ax in axes[len(names):]:
         ax.axis("off")
     fig.tight_layout(h_pad=1.6, w_pad=1.6)
-    save(fig, out, f"fig6_7_roc{tag}.png")
+    save(fig, out, f"fig6_10_roc{tag}.png")
 
     print("\n  One-vs-rest ROC AUC")
     for n, a in aucs.items():
@@ -179,7 +180,7 @@ def fig_pr(y_true, proba, names, out, tag):
     for ax in axes[len(names):]:
         ax.axis("off")
     fig.tight_layout(h_pad=1.6, w_pad=1.6)
-    save(fig, out, f"fig6_8_pr{tag}.png")
+    save(fig, out, f"fig6_11_pr{tag}.png")
 
     print("\n  One-vs-rest average precision")
     for n, a in aps.items():
@@ -222,7 +223,7 @@ def main():
     fig_confusion(y_true, y_pred, names, args.out, tag)
     fig_roc(y_true, proba, names, args.out, tag)
     fig_pr(y_true, proba, names, args.out, tag)
-    print("\nDone. Figures 6.6, 6.7 and 6.8 are in", os.path.abspath(args.out))
+    print("\nDone. Figures 6.9, 6.10 and 6.11 are in", os.path.abspath(args.out))
 
 
 if __name__ == "__main__":
