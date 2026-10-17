@@ -299,7 +299,11 @@ def supervised_open_set(p, X, id_index, y, unknown, fit_idx, cal_idx, te_idx,
     from train_zeroday import build_model, predict
 
     y_test = y[te_idx]
-    known_names = [c for c in CLASS_NAMES if c != unknown]
+    # `unknown` is a class index, so it has to be resolved to a name before it
+    # can be compared with CLASS_NAMES; comparing the two directly kept every
+    # class and built a k-way head against a (k-1)-way checkpoint.
+    unknown_name = CLASS_NAMES[unknown]
+    known_names = [c for c in CLASS_NAMES if c != unknown_name]
     remap = {CLASS_TO_IDX[c]: i for i, c in enumerate(known_names)}
     y_small = np.full(len(y), -1, dtype=np.int64)
     for orig, new in remap.items():
