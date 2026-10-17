@@ -166,9 +166,20 @@ of the remaining experiments were not run, which the paper now does explicitly.
 
 ---
 
-## 5. What I could not do
+## 5. What I could not do, and how far the code was tested
 
-The five experimental demands need your data and your machine. I wrote and tested
-the code against a synthetic capture built to GEM-CAN's documented structure —
-every code path runs — but the numbers have to come from your capture, and I will
-not put numbers in a paper that I did not measure.
+The five experimental demands need your data and your machine. The numbers have
+to come from your capture, and I will not put numbers in a paper that I did not
+measure.
+
+How far each script was actually exercised, so you know what to watch for:
+
+| Script | Tested how |
+|---|---|
+| `bus_rate.py` | Run end to end on a synthetic capture. Frame-rate arithmetic checked against the generator's known inter-arrival distribution. |
+| `convert_dataset.py` | Run end to end on a synthetic Car-Hacking-shaped source, and the output loaded back through `preprocessing/loader.py` to confirm the labels survive. |
+| `extra_baselines.py` | Scoring functions unit-tested: the range check recovered 100% of injected out-of-range frames at a 1% false-alarm rate, the isolation forest 100% at 0.7%, the calibration quantile matched the analytic value, and MSP and energy ordered confident and uniform predictions correctly. Then run end to end against a full training run on a synthetic capture. |
+| `loao_sweep.py` | Aggregation, resumption and the confidence interval checked against archived runs with known means. The sweep driver calls `train_zeroday.py` unchanged. |
+
+A synthetic capture exercises the code paths. It cannot tell you whether a
+baseline beats your method on your data — only your run can do that.
