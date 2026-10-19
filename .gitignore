@@ -20,3 +20,6 @@ results/loao_runs/
 results/loao_sweep.json
 results/bus_rate.json
 results/extra_baselines.json
+
+# SynCAN run artefacts: measurements, not sources
+results/syncan_zd_*/
