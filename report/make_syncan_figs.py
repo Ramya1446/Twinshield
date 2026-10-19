@@ -138,6 +138,78 @@ def fig_fpr(data, out_dir):
     return p
 
 
+def fig_residual_ratio(out_dir, results_dir):
+    """Why the gate transfers or does not: attack residual over normal residual."""
+    gem_path = os.path.join(results_dir, "gem_zero_day.json")
+    if not os.path.exists(gem_path):
+        print(f"  (skipping the residual-ratio figure: {gem_path} is not here)")
+        return None
+    gem = load(gem_path)
+
+    rows = []            # (row label, ratio, can_id, label_text)
+    for r in gem["gate"]["residual_by_can_id"]:
+        rows.append(("GEM-CAN", r["mean_residual_attack"] / r["mean_residual_normal"],
+                     r["can_id"], r["class"]))
+    for slot, slug in SLUG.items():
+        zd = load(os.path.join(results_dir, f"syncan_zero_day_{slug}.json"))
+        seen = set()
+        for r in zd["gate"]["residual_by_can_id"]:
+            if r["class"] != slot or r["can_id"] in seen:
+                continue
+            seen.add(r["can_id"])
+            rows.append((f"SynCAN\n{SLOT_TO_SYNCAN[slot]}",
+                         r["mean_residual_attack"] / r["mean_residual_normal"],
+                         r["can_id"], SLOT_TO_SYNCAN[slot]))
+
+    order = ["GEM-CAN", "SynCAN\nflooding", "SynCAN\nplateau", "SynCAN\ncontinuous"]
+    short = {"GEM-CAN": "GEM-CAN", "SynCAN\nflooding": "flooding",
+             "SynCAN\nplateau": "plateau", "SynCAN\ncontinuous": "continuous"}
+    fig, ax = plt.subplots(figsize=(3.3, 2.9))
+    ax.axvline(1.0, color=GREY, linewidth=0.9, linestyle=(0, (4, 3)), zorder=2)
+    ax.text(1.0, 3.58, " no change", fontsize=6, color=GREY, va="center")
+    for y, grp in enumerate(order):
+        vals = [(v, cid, lab) for g, v, cid, lab in rows if g == grp]
+        for v, cid, lab in vals:
+            hit = v >= 5.0
+            ax.plot(v, y, "o", markersize=5.2 if hit else 3.6,
+                    color=ORANGE if hit else "#9b9992",
+                    markeredgecolor=INK if hit else GREY,
+                    markeredgewidth=0.7 if hit else 0.5, zorder=4)
+            if hit:
+                ax.annotate("brake tampering\n100% detected",
+                            (v, y), textcoords="offset points", xytext=(3, 9),
+                            ha="right", va="bottom", fontsize=5.8, color=INK)
+            elif grp == "GEM-CAN":
+                ax.annotate("steering tampering\n0% detected",
+                            (v, y), textcoords="offset points", xytext=(-3, -9),
+                            ha="left", va="top", fontsize=5.8, color=GREY)
+    ax.set_yticks(range(len(order)))
+    ax.set_yticklabels([short[o] for o in order], fontsize=7)
+    ax.set_ylim(-1.15, 3.8)
+    ax.set_xscale("log")
+    ax.set_xlim(0.33, 24)
+    ax.set_xticks([0.5, 1, 2, 5, 10, 20])
+    ax.set_xticklabels(["0.5x", "1x", "2x", "5x", "10x", "20x"], fontsize=7)
+    ax.minorticks_off()
+    ax.set_xlabel("mean residual under attack, as a multiple\nof the mean residual "
+                  "on normal traffic", fontsize=7.5)
+    ax.xaxis.grid(True, color=GRIDC, linewidth=0.7, zorder=0)
+    ax.set_axisbelow(True)
+    for s in ("top", "right", "left"):
+        ax.spines[s].set_visible(False)
+    ax.tick_params(axis="y", length=0)
+    fig.tight_layout()
+    p = os.path.join(out_dir, "fig_syncan_residual_ratio.png")
+    fig.savefig(p, dpi=300, bbox_inches="tight")
+    plt.close(fig)
+
+    syn = [v for g, v, _, _ in rows if g != "GEM-CAN"]
+    syn.sort()
+    print(f"\nSynCAN residual ratios: min {syn[0]:.2f}  median "
+          f"{syn[len(syn)//2]:.2f}  max {syn[-1]:.2f}  ({len(syn)} identifier-class pairs)")
+    return p
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--results", default=os.path.join(ROOT, "results"))
@@ -157,7 +229,7 @@ def main() -> None:
         row = []
         for v in ("with_id", "no_id"):
             m = res["results"].get(v, {}).get(name)
-            row.append(f"{m['metrics']['macro_f1']:.4f}" if m else "--")
+            row.append(f"{m['metrics']['Macro F1']:.4f}" if m else "--")
         print(f"{name:<34}{row[0]:>10}{row[1]:>13}")
     dt = res["digital_twin"]
     print(f"\ntwin on held-out normal SynCAN frames: MAE {dt['MAE']:.4f} bytes "
@@ -183,6 +255,9 @@ def main() -> None:
                   f"frame share {st['channel_frame_share']:.2f}")
 
     print("\n ", fig_zeroday(data, args.out))
+    r = fig_residual_ratio(args.out, args.results)
+    if r:
+        print(" ", r)
     print(" ", fig_fpr(data, args.out))
 
 

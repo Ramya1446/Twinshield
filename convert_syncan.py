@@ -74,7 +74,7 @@ def read_syncan(path: str, nrows: int | None) -> pd.DataFrame:
     return df[keep].rename(columns={c: f"s{i}" for i, c in enumerate(sig)})
 
 
-def to_frames(df: pd.DataFrame, slot: str) -> pd.DataFrame:
+def to_frames(df: pd.DataFrame, slot: str, bits: int = 16) -> pd.DataFrame:
     """Pack the signal columns into eight payload bytes, GEM-CAN schema."""
     ids = df["ID"].astype(str).str.strip()
     unknown = sorted(set(ids) - set(HEX_OF))
@@ -84,7 +84,7 @@ def to_frames(df: pd.DataFrame, slot: str) -> pd.DataFrame:
     out = pd.DataFrame()
     out["timestamp"] = pd.to_numeric(df["Time"], errors="coerce") / 1000.0  # ms -> s
     out["arbitration_id"] = ids.map(HEX_OF)
-    out["dlc"] = ids.map(N_SIGNALS).astype(int) * 2
+    out["dlc"] = ids.map(N_SIGNALS).astype(int) * (2 if bits == 16 else 1)
 
     n_sig = sum(1 for c in df.columns if c.startswith("s"))
     for k in range(4):
@@ -94,9 +94,16 @@ def to_frames(df: pd.DataFrame, slot: str) -> pd.DataFrame:
         else:
             v = np.zeros(len(df))
         v = np.nan_to_num(np.clip(v, 0.0, 1.0), nan=0.0)
-        q = np.rint(v * 65535.0).astype(np.int64)
-        out[f"data{2 * k}"] = [format(x, "02X") for x in (q >> 8) & 0xFF]
-        out[f"data{2 * k + 1}"] = [format(x, "02X") for x in q & 0xFF]
+        if bits == 16:
+            q = np.rint(v * 65535.0).astype(np.int64)
+            out[f"data{2 * k}"] = [format(x, "02X") for x in (q >> 8) & 0xFF]
+            out[f"data{2 * k + 1}"] = [format(x, "02X") for x in q & 0xFF]
+        else:
+            q = np.rint(v * 255.0).astype(np.int64)
+            out[f"data{k}"] = [format(x, "02X") for x in q & 0xFF]
+    if bits == 8:
+        for k in range(4, 8):
+            out[f"data{k}"] = "00"
 
     lab = pd.to_numeric(df["Label"], errors="coerce").fillna(0).astype(int)
     out["Attack_Type"] = np.where(lab == 1, slot, "Normal")
@@ -112,6 +119,11 @@ def main() -> None:
                     help="rows taken from train_1.csv for the attack-free capture")
     ap.add_argument("--attack-rows", type=int, default=50_000,
                     help="rows taken from each attack test file")
+    ap.add_argument("--bits", type=int, default=16, choices=[8, 16],
+                    help="bits per signal in the packed payload. 16 is the "
+                         "faithful encoding; 8 exists as a control, to show "
+                         "that the gate's behaviour here is not an artefact "
+                         "of the quantisation")
     args = ap.parse_args()
 
     print("=" * 74)
@@ -128,7 +140,7 @@ def main() -> None:
     src_norm = os.path.join(args.src, "train_1.csv")
     if not os.path.exists(src_norm):
         raise SystemExit(f"not found: {src_norm}")
-    nf = to_frames(read_syncan(src_norm, args.normal_rows), "Normal")
+    nf = to_frames(read_syncan(src_norm, args.normal_rows), "Normal", args.bits)
     if (nf["Attack_Type"] != "Normal").any():
         raise SystemExit("train_1.csv carried an attack label; refusing to use it "
                          "as the attack-free capture")
@@ -144,7 +156,7 @@ def main() -> None:
         p = os.path.join(args.src, fname)
         if not os.path.exists(p):
             raise SystemExit(f"not found: {p}")
-        af = to_frames(read_syncan(p, args.attack_rows), slot)
+        af = to_frames(read_syncan(p, args.attack_rows), slot, args.bits)
         af["timestamp"] = af["timestamp"] - af["timestamp"].min() + cursor
         cursor = float(af["timestamp"].max()) + 1.0
         parts.append(af)
@@ -160,8 +172,10 @@ def main() -> None:
     with open(os.path.join(args.out, "conversion.json"), "w", encoding="utf-8") as fh:
         json.dump({"source": "SynCAN (ETAS), https://github.com/etas/SynCAN",
                    "citation": "Hanselmann et al., CANet, IEEE Access 8:58194, 2020",
-                   "encoding": "each signal as uint16 big-endian, signal k -> "
-                               "payload bytes 2k, 2k+1",
+                   "encoding": (f"each signal as uint{args.bits}"
+                                + (" big-endian, signal k -> payload bytes 2k, 2k+1"
+                                   if args.bits == 16 else ", signal k -> payload byte k")),
+                   "bits_per_signal": args.bits,
                    "slot_assignment": {f[5:-4]: s for f, s in SLOT_OF.items()},
                    "excluded": ["playback", "suppress"],
                    "id_map": HEX_OF,
