@@ -43,9 +43,11 @@ s.addText(
 
 const meta = [
   [{ text: "Student Names: ", options: { bold: true } },
-   { text: "[Name 1 (Reg. No.)], [Name 2 (Reg. No.)], [Name 3 (Reg. No.)]" }],
-  [{ text: "Guide Name: ", options: { bold: true } }, { text: "[Dr. Guide Name (Emp. ID)]" }],
-  [{ text: "School: ", options: { bold: true } }, { text: "[School Name], VIT Chennai" }],
+   { text: "Ramya Nakshathra (23BCE1611), Agilan (23BCE1790)" }],
+  [{ text: "Guide Name: ", options: { bold: true } },
+   { text: "Dr. S. Anubha Pearline, Assistant Professor" }],
+  [{ text: "School: ", options: { bold: true } },
+   { text: "School of Computer Science and Engineering, VIT Chennai" }],
 ];
 meta.forEach((runs, i) => {
   s.addText(runs, {
@@ -215,10 +217,10 @@ s.addTable([
   fill: { color: WHITE }, margin: 2, rowH: 0.20,
 });
 cur[2] += 0.20 * 5 + 0.12;
-picture(2, "p_image3.png", 2.32, 1263 / 1819,
-  "Leave-one-attack-out: brake tampering removed from every training stage; detection on its 119 held-out frames.");
+picture(2, "p_image3.png", 1.80, 1263 / 1819,
+  "Leave-one-attack-out: brake tampering removed from every training stage.");
 bullets(2, [
-  "On the closed set the four architectures span only 0.0031 macro-F1; under quarantine they separate by 74 points, and every detection comes from the gate, not the classifier.",
+  "On the closed set the four architectures span only 0.0031 macro-F1; under quarantine they separate by 74 points, and every detection comes from the gate.",
   "The residual rises 2.64 to 25.13 bytes on the brake identifier (9.5x) but falls on the steering identifier, which the gate misses. On SynCAN it stays near 1.04x and the gate detects at most 7.07%.",
 ], { fontSize: 9.5 });
 
@@ -226,7 +228,7 @@ heading(2, "CONCLUSION");
 bullets(2, [
   "Closed-set accuracy no longer separates CAN intrusion detectors; a leave-one-attack-out protocol does.",
   "A twin fitted on normal traffic alone detects an attack class no component ever saw, at 2.26% false alarms and 12.0 ms per frame.",
-  "Its boundary is measured, not assumed: implausible payloads are caught, plausible ones are not.",
+  "Its boundary is measured: implausible payloads are caught, plausible ones are not.",
 ], { fontSize: 9.5 });
 
 heading(2, "REFERENCES");
@@ -234,17 +236,20 @@ bullets(2, [
   "ISO 11898-1, Road Vehicles - Controller Area Network, Part 1.",
   "K. Koscher et al., \"Experimental security analysis of a modern automobile,\" IEEE S&P, 2010.",
   "H. M. Song, J. Woo, H. K. Kim, \"In-vehicle network IDS using deep CNN,\" Veh. Commun., 2020.",
-  "M. Hanselmann et al., \"CANet: Unsupervised IDS for CAN bus data,\" IEEE Access, 8:58194, 2020.",
-  "M. Tavasoli et al., \"GEM-CAN: Real-world CAN-bus attack scenarios,\" 2024.",
+  "M. Hanselmann et al., \"CANet: Unsupervised IDS for CAN data,\" IEEE Access, 8, 2020.",
+  "M. Tavasoli et al., \"GEM-CAN: Real-world CAN-bus attacks,\" 2024.",
 ], { fontSize: 8.5 });
 
 heading(2, "CONTACT");
-para(2, [
-  { text: "Email: ", options: { bold: true } },
-  { text: "[student@vitstudent.ac.in]   " },
-  { text: "Mobile: ", options: { bold: true } },
-  { text: "[+91 XXXXXXXXXX]" },
-], 9.5, 0.0);
+[["Ramya Nakshathra", "+91 91235 35795"],
+ ["Agilan", "+91 81222 45774"],
+ ["Dr. S. Anubha Pearline (Guide)", "+91 99940 31215"]].forEach(([who, tel], i) => {
+  s.addText([{ text: who, options: { bold: true } }, { text: "   " + tel }], {
+    x: COLX[2] + PAD, y: cur[2] + i * 0.18, w: TW, h: 0.18, isTextBox: true,
+    margin: 0, fontFace: BODY, fontSize: 9.5, color: INK,
+  });
+});
+cur[2] += 3 * 0.18;
 
 const LIMIT = BODY_B - PAD;
 cur.forEach((y, i) =>
