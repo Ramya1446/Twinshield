@@ -161,12 +161,22 @@ def fig_residual_ratio(out_dir, results_dir):
                          r["mean_residual_attack"] / r["mean_residual_normal"],
                          r["can_id"], SLOT_TO_SYNCAN[slot]))
 
-    order = ["GEM-CAN", "SynCAN\nflooding", "SynCAN\nplateau", "SynCAN\ncontinuous"]
-    short = {"GEM-CAN": "GEM-CAN", "SynCAN\nflooding": "flooding",
-             "SynCAN\nplateau": "plateau", "SynCAN\ncontinuous": "continuous"}
-    fig, ax = plt.subplots(figsize=(3.3, 2.9))
+    # CICIoV2024 attack identifiers carry no benign traffic, so there is no
+    # same-identifier normal residual; they are placed against the twin's mean
+    # error on normal traffic (1.879 bytes), which the caption states.
+    CIC = [("DoS", 18.96), ("powertrain", 26.52), ("powertrain", 40.66),
+           ("steering", 37.49)]
+    for lab, v in CIC:
+        rows.append(("CICIoV2024", v / 1.879, "", lab))
+
+    order = ["GEM-CAN", "CICIoV2024", "SynCAN\nflooding", "SynCAN\nplateau",
+             "SynCAN\ncontinuous"]
+    short = {"GEM-CAN": "GEM-CAN", "CICIoV2024": "CICIoV2024",
+             "SynCAN\nflooding": "SynCAN flooding", "SynCAN\nplateau": "SynCAN plateau",
+             "SynCAN\ncontinuous": "SynCAN continuous"}
+    fig, ax = plt.subplots(figsize=(3.3, 3.2))
     ax.axvline(1.0, color=GREY, linewidth=0.9, linestyle=(0, (4, 3)), zorder=2)
-    ax.text(1.0, 3.58, " no change", fontsize=6, color=GREY, va="center")
+    ax.text(1.0, 4.58, " no change", fontsize=6, color=GREY, va="center")
     for y, grp in enumerate(order):
         vals = [(v, cid, lab) for g, v, cid, lab in rows if g == grp]
         for v, cid, lab in vals:
@@ -175,7 +185,7 @@ def fig_residual_ratio(out_dir, results_dir):
                     color=ORANGE if hit else "#9b9992",
                     markeredgecolor=INK if hit else GREY,
                     markeredgewidth=0.7 if hit else 0.5, zorder=4)
-            if hit:
+            if hit and grp == "GEM-CAN":
                 ax.annotate("brake tampering\n100% detected",
                             (v, y), textcoords="offset points", xytext=(3, 9),
                             ha="right", va="bottom", fontsize=5.8, color=INK)
@@ -183,13 +193,20 @@ def fig_residual_ratio(out_dir, results_dir):
                 ax.annotate("steering tampering\n0% detected",
                             (v, y), textcoords="offset points", xytext=(-3, -9),
                             ha="left", va="top", fontsize=5.8, color=GREY)
+    if "CICIoV2024" in order:
+        yc = order.index("CICIoV2024")
+        vals = [v for g, v, _, _ in rows if g == "CICIoV2024"]
+        ax.annotate("every class\n100% detected",
+                    (min(vals), yc), textcoords="offset points", xytext=(-4, 10),
+                    ha="right", va="bottom", fontsize=5.8, color=INK)
     ax.set_yticks(range(len(order)))
     ax.set_yticklabels([short[o] for o in order], fontsize=7)
-    ax.set_ylim(-1.15, 3.8)
+    ax.set_ylim(-1.15, 4.8)
     ax.set_xscale("log")
-    ax.set_xlim(0.33, 24)
+    ax.set_xlim(0.33, 40)
     ax.set_xticks([0.5, 1, 2, 5, 10, 20])
     ax.set_xticklabels(["0.5x", "1x", "2x", "5x", "10x", "20x"], fontsize=7)
+    ax.set_xlim(0.33, 40)
     ax.minorticks_off()
     ax.set_xlabel("mean residual under attack, as a multiple\nof the mean residual "
                   "on normal traffic", fontsize=7.5)
