@@ -35,15 +35,16 @@ def run(path):
     d = Doc(path)
     ref_i = [i for i, b in enumerate(d.blocks)
              if b.startswith('<w:p') and d.text(i).strip() == 'REFERENCES'][0]
-    bio_i = [i for i, b in enumerate(d.blocks)
-             if b.startswith('<w:p') and 'received the B.E. degree' in d.text(i)][0]
-
+    # the author biographies are rewritten before this runs, so the end of the
+    # reference list is found from the entries themselves rather than from them
     old = []
-    for i in range(ref_i + 1, bio_i):
+    for i in range(ref_i + 1, len(d.blocks)):
         if d.blocks[i].startswith('<w:p'):
             t = d.text(i).strip()
             if re.match(r'^\[\d+\]', t):
                 old.append((i, t))
+            elif old and len(t) > 80:
+                break          # first biography paragraph: the list has ended
     assert len(old) >= 26, f"only {len(old)} reference entries found"
     tpl = d.blocks[old[0][0]]
     body = {}

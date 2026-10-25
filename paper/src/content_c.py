@@ -113,6 +113,16 @@ SEC5 = [
      "II-B; we treat it as the recognition channel and make no claim that it "
      "generalises beyond the classes it was fitted on."),
     ("body",
+     "The attention-weighted fusion is described here for completeness because it is "
+     "part of the implementation, but it is not claimed as a source of the results. "
+     "The ablation of Section VI-G measures its contribution directly and finds it to "
+     "be nil in both input variants, 0.9979 to 0.9979 with the identifier and 0.9979 "
+     "to 0.9979 without it, and the decomposition of Section VI-A shows that it "
+     "contributes none of the quarantined-class detection either. The component this "
+     "paper claims is the residual gate of Section IV-D; readers reproducing the "
+     "method should expect the residual, not the attention layer, to carry the "
+     "result."),
+    ("body",
      "The two branches are joined by disjunction. A frame raises an alarm if the "
      "supervised head assigns it any class other than Normal, or if the gate fires. "
      "The disjunction is deliberate: the classifier is precise on what it knows and "
@@ -140,8 +150,11 @@ SEC6 = [
     ("sec", "VI.  EXPERIMENTAL SETUP"),
     ("sub", "A.  EXPERIMENTAL ENVIRONMENT"),
     ("body",
-     "All models are implemented in PyTorch and trained and evaluated on CPU with a "
-     "fixed random seed of 42. No GPU is used at any stage, which is deliberate: the "
+     "All models are implemented in PyTorch and trained and evaluated on CPU. The "
+     "main results use a fixed random seed of 42, and the leave-one-attack-out "
+     "experiment on CICIoV2024 is additionally repeated with seeds 1, 2 and 3 so "
+     "that the figures in Section VI-B carry an uncertainty rather than resting on "
+     "one draw. No GPU is used at any stage, which is deliberate: the "
      "runtime figures in Section VII-I are then measured on hardware comparable to "
      "what a vehicle or a workshop diagnostic tool could plausibly carry, rather than "
      "on an accelerator that no production ECU contains."),

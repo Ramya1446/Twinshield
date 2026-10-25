@@ -21,12 +21,19 @@ ABSTRACT = (
     "known attack. We evaluate on two real captures: GEM-CAN, 143,444 frames from a "
     "Polaris GEM e6 electric vehicle, and CICIoV2024, a capture from a 2019 Ford. "
     "With one attack class quarantined from every training stage on GEM-CAN, the "
-    "three supervised baselines detect 0.84%, 0.00% and 25.21% of it while "
-    "TwinShield-Fusion detects 100.00% at a 2.26% false-positive rate. "
-    "On CICIoV2024 the same protocol, run once for each attack class, detects 100.00% of every quarantined class at a 0.37% false-positive rate, where the best supervised baseline reaches 35.71%. The boundary of the method is measured rather than assumed: "
-    "the residual gate detects attacks that place implausible values on the bus, and "
-    "does not detect attacks whose forged values lie inside the range the twin "
-    "already accepts."
+    "three supervised baselines detect 0.84%, 0.00% and 25.21% of that class while "
+    "TwinShield-Fusion detects 100.00% of it at a 2.26% false-positive rate. On "
+    "CICIoV2024 the same protocol, applied once to each of three attack classes, "
+    "detects 100.00% of each at a 0.37% false-positive rate. Every one of these "
+    "figures is specific to the class named as quarantined in that run; none of them "
+    "is a claim of universal zero-day detection. The boundary is measured rather than "
+    "assumed, and we report it: on the same GEM-CAN capture the gate detects none of "
+    "the steering-tampering class, whose forged payloads lie inside the range the "
+    "twin already accepts, and on SynCAN, a synthetic benchmark composed entirely of "
+    "attacks of that kind, it detects at most 7.07%. We further show that both public "
+    "captures are far more redundant than their size suggests, CICIoV2024 containing "
+    "only 3,588 distinct identifier-payload tuples across 1.4 million frames, so "
+    "frame-level scores on them measure the benchmark as much as the detector."
 )
 
 INDEX = ("Automotive cyber-physical security, controller area network, digital twin, "
@@ -124,10 +131,13 @@ SEC2 = [
      "This paper makes the following contributions."),
     ("body",
      "1) TwinShield-Fusion, a detector that combines a supervised CNN-BiLSTM "
-     "classifier with a GRU digital twin of normal CAN behaviour, in which the "
-     "standardised per-identifier, per-byte prediction residual is read through two "
-     "views, a per-frame view and a per-ECU-stream view, and thresholded at a "
-     "false-positive rate calibrated on normal traffic alone."),
+     "classifier with a GRU digital twin of normal CAN behaviour. The standardised "
+     "per-identifier, per-byte prediction residual is read through two views, a "
+     "per-frame view and a per-ECU-stream view, and thresholded at a false-positive "
+     "rate calibrated on normal traffic alone. The residual gate is the component we "
+     "claim; the attention-weighted multi-ECU fusion is retained from the backbone "
+     "and we show in Section VI-G that it contributes no measurable gain in these "
+     "experiments."),
     ("body",
      "2) A leave-one-attack-out protocol with a four-stage quarantine. The held-out "
      "class is removed from the label space, from every training context window, from "
@@ -147,7 +157,13 @@ SEC2 = [
      "not detect attacks whose forged values lie inside the learnt-normal range. We "
      "report the case where our own method fails rather than omitting it."),
     ("body",
-     "6) The false-alarm cost of the second channel, expressed both as a rate and as "
-     "alarms per unit time on a bus of a given frame rate, so that the operating point "
-     "can be judged against a triage budget rather than against a table."),
+     "6) The false-alarm cost of the second channel, expressed as a rate, as alarms "
+     "per unit time on a bus of a given frame rate, and as a detection-against-false-alarm curve over the whole threshold range, so that the operating point can be "
+     "judged against a triage budget rather than against a single table entry."),
+    ("body",
+     "7) A redundancy and leakage audit of both public captures, which finds that "
+     "87.4% of GEM-CAN frames and 99.9% of CICIoV2024 frames are byte-identical to "
+     "another frame, and that the whole CICIoV2024 release contains 3,588 distinct "
+     "identifier-payload tuples in 1.4 million frames. Frame-level scores on these "
+     "benchmarks have to be read in that light, including ours."),
 ]

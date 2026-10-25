@@ -67,6 +67,45 @@ SEC7 = [
     ("tcap", "Leave-one-attack-out on CICIoV2024: each attack slot quarantined from "
              "every training stage in turn"),
     ("table", "CIC_ZD"),
+    ("body",
+     "Two qualifications belong with that table. The first is that the separation is "
+     "complete over the whole threshold range, not only at the operating point: the "
+     "area under the detection-against-false-alarm curve is 1.000 for all three "
+     "classes, and 100% detection is still reached at the smallest false-alarm rate "
+     "the sweep resolves. Fig. 6 plots it. That is a strong result, and it is also a "
+     "warning sign."),
+    ("body",
+     "The second is the redundancy documented in Section III-C. CICIoV2024 contains "
+     "3,588 distinct identifier-and-payload tuples in 1,408,219 frames, its attack "
+     "classes are drawn from as few as two or three distinct tuples, and no attack "
+     "identifier appears anywhere in the benign capture. A detector facing that "
+     "capture is close to facing a lookup problem, and a perfect score on it should "
+     "be read accordingly. We report these numbers because they are the honest "
+     "context for the table above: the CICIoV2024 result confirms that the method "
+     "transfers to a second vehicle and a second attack family, and it does not, on "
+     "its own, establish detection capability at the level the raw figures suggest. "
+     "The GEM-CAN experiment, where the tampering attacks ride on identifiers that "
+     "also carry legitimate traffic, is the harder and more informative of the two."),
+    ("body",
+     "To put an uncertainty on those figures rather than relying on a single seeded "
+     "run, the steering-spoofing quarantine was repeated with four random seeds. "
+     "Detection is perfectly stable: 100.00% on every seed, with a standard deviation "
+     "of zero, as are the known-class macro-F1 of 1.0000 and the area under the curve "
+     "of 1.000. The false-alarm rate is not stable. Across the four seeds it takes "
+     "the values 0.37%, 0.35%, 0.55% and 0.02%, a mean of 0.32% with a standard "
+     "deviation of 0.22, so the operating point moves by more than an order of "
+     "magnitude while the detection rate does not move at all."),
+    ("body",
+     "That asymmetry is informative and we report it rather than quoting the best "
+     "seed. It follows from how the threshold is set: the gate\u2019s quantile is read "
+     "from whichever normal validation frames the split assigns, and on a capture "
+     "whose payload vocabulary is as small as this one a different draw of validation "
+     "blocks shifts the tail of the normal score distribution appreciably. The "
+     "detection rate is insensitive to that shift because, as Fig. 6 shows, the "
+     "attack and normal score distributions do not overlap at all here. On a harder "
+     "capture the same sensitivity would move the detection rate as well, which is "
+     "the reason the false-alarm figures in this paper should be read as an operating "
+     "region rather than as a single number."),
     ("sub", "C.  COMPARATIVE ANALYSIS ACROSS DATASETS"),
     ("body",
      "Table IX places the quarantined-class result from both vehicles side by side. Across two real captures and four held-out classes, TwinShield-Fusion raises an alarm on every held-out frame, while the best supervised baseline on any of them reaches 35.71% and is usually at or near zero. The false-alarm cost differs by nearly an order of magnitude between the captures, 2.26% on GEM-CAN against 0.37% on CICIoV2024, which tracks how well the twin fits each vehicle: a mean absolute error of 10.52 bytes on the GEM e6 against 1.88 on the Ford."),
@@ -149,6 +188,15 @@ SEC7 = [
      "are counted as alarms of the system, and the normal traffic used for validation "
      "is not the normal traffic used for test."),
     ("body",
+     "Fig. 6 shows the whole trade-off rather than the single point. On CICIoV2024 "
+     "the curve is effectively a step: detection reaches 100% at a false-alarm rate "
+     "below the sweep resolution and stays there, with an area under the curve of "
+     "1.000 for all three quarantined classes, so the operating point reported in "
+     "Table VIII is conservative and could be lowered by an order of magnitude at no "
+     "cost in detection. The GEM-CAN run available to us recorded the operating point "
+     "only and not the full sweep, so the corresponding curve for that capture is "
+     "left for future work rather than estimated here."),
+    ("body",
      "The operationally meaningful unit is alarms per unit time. At 2.26%, a bus "
      "carrying f frames per second produces 0.0226f alarms per second. At any frame "
      "rate a production powertrain bus sustains, that is more alarms than an operator "
@@ -163,6 +211,14 @@ SEC7 = [
      "GEM-CAN every missed frame of the quarantined class is zero, because the gate "
      "detects all 119; the systematic false negative is steering tampering, which the "
      "gate misses entirely for the reason given in Section VII-E. On CICIoV2024 there are no false negatives at all: every frame of every quarantined class raises an alarm, and the false-alarm rate falls to 0.37%."),
+    ("fig6", None),
+    ("fcap",
+     "FIGURE 6.  Detection of the quarantined class against false alarms on normal "
+     "traffic, as the gate threshold is swept, on CICIoV2024. The three curves "
+     "coincide and are drawn with different dash patterns for that reason; the area "
+     "under each is 1.000. The circle marks the operating point reported in Table "
+     "VIII, which is conservative: detection is already complete at a far smaller "
+     "false-alarm rate."),
     ("sub", "G.  ABLATION STUDY"),
     ("body",
      "Table V isolates the contribution of each component on the same CNN-BiLSTM "
@@ -293,7 +349,9 @@ SEC8 = [
      "closed-set figures. All figures come from a single seeded run: the 74-point gap "
      "that carries the argument is far larger than any plausible seed variance, while "
      "the differences of a few thousandths in Tables IV and V are not, and we claim no "
-     "ordering among the four architectures. The baseline set contains three "
+     "ordering among the four architectures. The CICIoV2024 quarantine was repeated "
+     "over four seeds, which bounds that concern there but not on GEM-CAN, where a "
+     "repeat would require access to the raw capture. The baseline set contains three "
      "supervised architectures and does not include the unsupervised comparisons a "
      "reader might reasonably expect: a plain autoencoder, a one-class model, an "
      "explicit open-set scoring rule, or a per-identifier range check, which is the "
@@ -302,7 +360,19 @@ SEC8 = [
      "ROAD remain untested and would each require the same conversion and the same "
      "four-stage quarantine before they could be reported."),
     ("body",
-     "One threat to validity is specific to CICIoV2024 and is restated here so that it "
+     "The most serious threat to validity is the redundancy of the benchmarks "
+     "themselves, quantified in Section III-C. When 99.9% of a capture’s frames are "
+     "byte-identical to another frame and the whole release holds 3,588 distinct "
+     "identifier-payload tuples, a frame-level score close to 1.000 is substantially "
+     "a measurement of the benchmark. This affects every detector evaluated on these "
+     "captures, ours included, and it is the reason we lead with the "
+     "leave-one-attack-out alarm rate rather than with closed-set accuracy, and the "
+     "reason we treat GEM-CAN rather than CICIoV2024 as the load-bearing "
+     "evaluation. A capture with per-frame labels, recorded timestamps and "
+     "substantially more distinct payloads would be needed to resolve detection "
+     "capability beyond the level these benchmarks can support."),
+    ("body",
+     "A further threat is specific to CICIoV2024 and is restated here so that it "
      "cannot be overlooked: the release carries no timestamp, so the inter-arrival "
      "feature is synthesised and constant on that dataset. Any conclusion that depends "
      "on timing is therefore not supported by the CICIoV2024 results, and the "

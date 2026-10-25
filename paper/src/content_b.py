@@ -194,6 +194,36 @@ SEC4 = [
      "detector, including a lookup table. Spoofing attacks are the ones that require a "
      "model of what the payload should have been, and they are the attacks against "
      "which this paper measures itself."),
+    ("body",
+     "A third benchmark is used in a supporting role and is named here so that the "
+     "evaluation is not overstated. SynCAN [19], released with CANet, is synthetic "
+     "rather than a vehicle capture: it provides signal values rather than payload "
+     "bytes, and its attack types hold a signal at a constant valid value, drift it "
+     "slowly, replay it or suppress it. It is used in Section VI-C only, to test the "
+     "operating condition of the residual gate against a family of attacks that the "
+     "two real captures do not contain. Results from it are reported as results from "
+     "a synthetic benchmark, never alongside the real-vehicle figures."),
+    ("body",
+     "One property of both real captures bears directly on how their scores should be "
+     "read. CAN traffic is highly repetitive by design, and these releases are more "
+     "repetitive than their frame counts suggest. On GEM-CAN, 87.4% of frames are "
+     "byte-identical to at least one other frame and 80.6% of test frames have an "
+     "exact counterpart in the training split. On CICIoV2024 the effect is far "
+     "stronger: the entire published release of 1,408,219 frames contains only 3,588 "
+     "distinct identifier-and-payload tuples, and in the converted capture used here "
+     "99.9% of frames are duplicates of another frame with 99.8% of test frames "
+     "having an exact counterpart in training. The attack classes are the most "
+     "degenerate part of it, with 19,977 steering-spoofing frames drawn from three "
+     "distinct tuples and 9,991 gas-spoofing frames from two."),
+    ("body",
+     "The consequence is stated plainly because it applies to our own results as much "
+     "as to anyone else's. A frame-level classifier on CICIoV2024 is close to a "
+     "lookup over a few thousand tuples, so near-perfect frame-level scores on that "
+     "capture are weak evidence of detection capability. We therefore treat GEM-CAN, "
+     "which is less degenerate and which contains tampering attacks on identifiers "
+     "that also carry legitimate traffic, as the load-bearing evaluation, and report "
+     "CICIoV2024 as corroboration whose benchmark limitations are visible rather than "
+     "hidden."),
     ("sub", "D.  PROBLEM DEFINITION AND THREAT MODEL"),
     ("body",
      "Let a capture be a sequence of frames f_t = (tau_t, i_t, d_t, p_t), where tau_t "

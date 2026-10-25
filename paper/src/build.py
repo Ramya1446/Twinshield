@@ -26,12 +26,39 @@ for key, rid in [('fig1', 'rId17'), ('fig2', 'rId9'), ('fig3', 'rId10'),
     hit = [i for i, b in enumerate(d.blocks) if f'r:embed="{rid}"' in b]
     assert len(hit) == 1, f"{key}: {len(hit)} blocks carry {rid}"
     FIGS[key] = d.blocks[hit[0]]
+# a figure the template does not already contain needs its own media part and rel
+def add_media(src, name):
+    import shutil
+    shutil.copy(src, os.path.join(os.path.dirname(DOC), 'media', name))
+    rp = os.path.join(os.path.dirname(DOC), '_rels', 'document.xml.rels')
+    rels = open(rp, encoding='utf-8').read()
+    rid = 'rId%d' % (max(int(n) for n in re.findall(r'Id="rId(\d+)"', rels)) + 1)
+    rels = rels.replace('</Relationships>',
+        f'<Relationship Id="{rid}" Type="http://schemas.openxmlformats.org/'
+        f'officeDocument/2006/relationships/image" Target="media/{name}"/>'
+        '</Relationships>')
+    open(rp, 'w', encoding='utf-8').write(rels)
+    return rid
+
 BRK2 = [b for i, b in enumerate(d.blocks)
         if b.startswith('<w:p') and '<w:sectPr' in b and 'w:num="2"' in b and i < 60]
 BRK1 = [b for i, b in enumerate(d.blocks)
         if b.startswith('<w:p') and '<w:sectPr' in b and 'w:num="2"' not in b and 11 < i < 60]
 assert BRK2 and BRK1, "could not find the one-column island's section breaks"
 KEPT = [d.blocks[i] for i in KEEP_TABLES]
+
+# Figure 6 is new: clone Figure 2's paragraph and point it at a fresh image part
+from PIL import Image
+OP = os.path.join('/home/user/Twinshield', 'report', 'figures',
+                  'fig_operating_point.png')
+_rid = add_media(OP, 'image90.png')
+_im = Image.open(OP)
+_cx = 2926080
+_cy = int(_cx * _im.height / _im.width)
+_f6 = FIGS['fig2']
+_f6 = re.sub(r'r:embed="rId\d+"', f'r:embed="{_rid}"', _f6)
+_f6 = re.sub(r'cx="\d+" cy="\d+"', f'cx="{_cx}" cy="{_cy}"', _f6)
+FIGS['fig6'] = _f6
 
 # ---------------------------------------------------------------- assemble
 out = []
@@ -99,6 +126,48 @@ idx_i = [i for i, b in enumerate(d.blocks)
          if b.startswith('<w:p') and 'INDEX TERMS' in d.text(i)][0]
 d.blocks[abs_i] = shell(d.blocks[abs_i], [('ABSTRACT ', True), (A.ABSTRACT, False)])
 d.blocks[idx_i] = shell(d.blocks[idx_i], [('INDEX TERMS ', True), (A.INDEX, False)])
+
+# ----------------------------------------------------------- author block
+AUTHORS = [
+    ("FIRST A. AUTHOR\u00b9, SECOND B. AUTHOR\u00b2, and THIRD C. AUTHOR\u00b3",
+     "RAMYA NAKSHATHRA\u00b9, AGILAN\u00b9, and S. ANUBHA PEARLINE\u00b9"),
+    ("\u00b9Department of Computer Science and Engineering, [Institution], [City], [Country]",
+     "\u00b9School of Computer Science and Engineering, Vellore Institute of "
+     "Technology, Chennai 600127, India"),
+    ("\u00b2Department of Computer Science and Engineering, [Institution], [City], [Country]",
+     ""),
+    ("\u00b3Department of Computer Science and Engineering, [Institution], [City], [Country]",
+     ""),
+    ("Corresponding author: First A. Author (e-mail: author@institution.edu).",
+     "Corresponding author: S. Anubha Pearline (e-mail: [corresponding author e-mail])."),
+]
+for old, new in AUTHORS:
+    hit = [i for i, b in enumerate(d.blocks)
+           if b.startswith('<w:p') and d.text(i).strip() == old]
+    if not hit:
+        continue
+    if new:
+        d.blocks[hit[0]] = shell(d.blocks[hit[0]], new)
+    else:
+        d.blocks[hit[0]] = ''
+
+bios = [i for i, b in enumerate(d.blocks)
+        if b.startswith('<w:p') and 'received the B.E. degree' in d.text(i)]
+BIO = [
+ "RAMYA NAKSHATHRA is currently pursuing the B.Tech. degree in computer science and "
+ "engineering with the School of Computer Science and Engineering, Vellore Institute "
+ "of Technology, Chennai, India. Her research interests include automotive "
+ "cybersecurity, intrusion detection and deep learning for time-series data.",
+ "AGILAN is currently pursuing the B.Tech. degree in computer science and "
+ "engineering with the School of Computer Science and Engineering, Vellore Institute "
+ "of Technology, Chennai, India. His research interests include in-vehicle network "
+ "security, anomaly detection and explainable machine learning.",
+ "S. ANUBHA PEARLINE is an Assistant Professor with the School of Computer Science "
+ "and Engineering, Vellore Institute of Technology, Chennai, India. [Degrees, "
+ "awarding institutions and research interests to be completed by the author.]",
+]
+for i, text in zip(bios, BIO):
+    d.blocks[i] = shell(d.blocks[i], text)
 
 # ------------------------------------------------- title and funding note
 ttl = [i for i, b in enumerate(d.blocks)
