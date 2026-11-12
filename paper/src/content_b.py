@@ -6,7 +6,7 @@ SEC3 = [
     ("body",
      "Research on in-vehicle intrusion detection divides along two axes: what the "
      "detector learns from, and what it is evaluated against. We review the field "
-     "along the first axis in Sections III-A to III-C and along the second in Section "
+     "along the first axis in Sections II-A to II-C and along the second in Section "
      "III-D, because the second is where this paper's contribution sits."),
     ("sub", "A.  CAN BUS INTRUSION DETECTION"),
     ("body",
@@ -43,7 +43,7 @@ SEC3 = [
      "Taylor et al. [20] trained a recurrent network to predict the next payload of an "
      "identifier and flagged large prediction errors. Shahriar et al. [19] built "
      "CANShield around multi-view reconstruction of the signal space. The closest "
-     "antecedent to this work is CANet [21], which learns a joint model of CAN signals "
+     "antecedent to this work is CANet [19], which learns a joint model of CAN signals "
      "with per-identifier subnetworks and scores reconstruction error. These methods "
      "are label-free and therefore not bounded by an attack catalogue, which is the "
      "property this paper builds on."),
@@ -68,7 +68,7 @@ SEC3 = [
     ("body",
      "Public captures for CAN intrusion detection include Car-Hacking and OTIDS from "
      "HCRL [13], the ROAD dataset of Verma et al. [23], the synthetic SynCAN benchmark "
-     "released with CANet [21], GEM-CAN from an autonomous electric vehicle [24], and "
+     "released with CANet [19], GEM-CAN from an autonomous electric vehicle [24], and "
      "CICIoV2024 from the Canadian Institute for Cybersecurity [25]. They differ in "
      "vehicle, bus speed, identifier set, attack family and recorded fields, and that "
      "heterogeneity is the obstacle to cross-dataset work: a model trained on one "
@@ -199,7 +199,7 @@ SEC4 = [
      "evaluation is not overstated. SynCAN [19], released with CANet, is synthetic "
      "rather than a vehicle capture: it provides signal values rather than payload "
      "bytes, and its attack types hold a signal at a constant valid value, drift it "
-     "slowly, replay it or suppress it. It is used in Section VI-C only, to test the "
+     "slowly, replay it or suppress it. It is used in Section VII-C only, to test the "
      "operating condition of the residual gate against a family of attacks that the "
      "two real captures do not contain. Results from it are reported as results from "
      "a synthetic benchmark, never alongside the real-vehicle figures."),

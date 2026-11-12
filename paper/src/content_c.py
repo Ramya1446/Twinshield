@@ -24,6 +24,14 @@ SEC5 = [
      "detector can therefore say that something is wrong even when it cannot say what "
      "is wrong, which is the behaviour an operational system needs and a closed-set "
      "classifier cannot provide."),
+    ("body",
+     "The name is worth fixing at the outset, because it has one meaning in this "
+     "paper and could be read as another. Fusion here refers to the joining of the "
+     "two detection channels, the supervised classifier and the residual gate, whose "
+     "decisions are combined as described in Section V-E. It does not refer to the "
+     "attention-weighted fusion of per-ECU streams inside the supervised branch; that "
+     "layer is part of the backbone, and its measured contribution to these results, "
+     "reported in Section VII-G, is nil."),
     ("sub", "B.  CAN TRAFFIC PREPROCESSING"),
     ("body",
      "Each frame is represented by its eight payload bytes scaled to [0,1], its data "
@@ -115,11 +123,11 @@ SEC5 = [
     ("body",
      "The attention-weighted fusion is described here for completeness because it is "
      "part of the implementation, but it is not claimed as a source of the results. "
-     "The ablation of Section VI-G measures its contribution directly and finds it to "
+     "The ablation of Section VII-G measures its contribution directly and finds it to "
      "be nil in both input variants, 0.9979 to 0.9979 with the identifier and 0.9979 "
-     "to 0.9979 without it, and the decomposition of Section VI-A shows that it "
+     "to 0.9979 without it, and the decomposition of Section VII-A shows that it "
      "contributes none of the quarantined-class detection either. The component this "
-     "paper claims is the residual gate of Section IV-D; readers reproducing the "
+     "paper claims is the residual gate of Section V-D; readers reproducing the "
      "method should expect the residual, not the attention layer, to carry the "
      "result."),
     ("body",
@@ -153,7 +161,7 @@ SEC6 = [
      "All models are implemented in PyTorch and trained and evaluated on CPU. The "
      "main results use a fixed random seed of 42, and the leave-one-attack-out "
      "experiment on CICIoV2024 is additionally repeated with seeds 1, 2 and 3 so "
-     "that the figures in Section VI-B carry an uncertainty rather than resting on "
+     "that the figures in Section VII-B carry an uncertainty rather than resting on "
      "one draw. No GPU is used at any stage, which is deliberate: the "
      "runtime figures in Section VII-I are then measured on hardware comparable to "
      "what a vehicle or a workshop diagnostic tool could plausibly carry, rather than "

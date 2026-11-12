@@ -81,6 +81,28 @@ def run(path):
     for i, b in enumerate(d.blocks):
         if b.startswith('<w:p') and i < old[0][0]:
             d.blocks[i] = re.sub(r'\[([\d,\s]+)\]', fix, b)
+
+    # Tables carried over from the source document still cite the OLD list, so
+    # they need the source-to-final map, not the draft-to-final one above.
+    old2new = {src: n for n, src in REUSE.items()}
+    tbl_hits = [0]
+    def fix_table(m):
+        parts = [q.strip() for q in m.group(1).split(',')]
+        out = []
+        for q in parts:
+            if q.isdigit():
+                v = int(q)
+                if v not in old2new:
+                    raise SystemExit(f"table cites [{v}], which no reference maps to")
+                out.append(str(old2new[v]))
+                tbl_hits[0] += 1
+            else:
+                out.append(q)
+        return '[' + ', '.join(out) + ']'
+    for i, b in enumerate(d.blocks):
+        if b.startswith('<w:tbl') and i < old[0][0]:
+            d.blocks[i] = re.sub(r'\[([\d,\s]+)\]', fix_table, b)
+    print(f"{tbl_hits[0]} citation numbers remapped inside carried-over tables")
     d.save()
     print(f"reference list rebuilt with {len(entries)} entries; "
           f"{hits[0]} in-text citation numbers remapped")

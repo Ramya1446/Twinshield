@@ -25,7 +25,15 @@ for key, rid in [('fig1', 'rId17'), ('fig2', 'rId9'), ('fig3', 'rId10'),
                  ('fig4', 'rId11'), ('fig5', 'rId16')]:
     hit = [i for i, b in enumerate(d.blocks) if f'r:embed="{rid}"' in b]
     assert len(hit) == 1, f"{key}: {len(hit)} blocks carry {rid}"
-    FIGS[key] = d.blocks[hit[0]]
+    blk = d.blocks[hit[0]]
+    # In the source document some images sit inline at the end of a body
+    # paragraph. Cloning such a paragraph would carry that paragraph's text into
+    # the rebuilt paper, so every run without a drawing is dropped here.
+    runs = re.findall(r'<w:r\b(?:(?!</w:r>).)*?</w:r>', blk, re.S)
+    for r in runs:
+        if '<w:drawing>' not in r:
+            blk = blk.replace(r, '', 1)
+    FIGS[key] = blk
 # a figure the template does not already contain needs its own media part and rel
 def add_media(src, name):
     import shutil

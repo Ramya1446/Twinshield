@@ -28,7 +28,8 @@ SEC7 = [
      "The result that separates the models is the open-set one. Table VI reports the "
      "leave-one-attack-out experiment with brake tampering quarantined from every "
      "training stage. The three supervised baselines raise an alarm on 0.84%, 0.00% "
-     "and 25.21% of the 119 held-out frames; TwinShield-Fusion raises one on all 119. "
+     "and 25.21% of the 119 held-out frames; TwinShield-Fusion raises one on all 119, "
+     "as Fig. 2 shows. "
      "The known-class macro-F1 column confirms that the proposed model has not bought "
      "that detection by degrading on the classes it kept."),
     ("tlabel", "TABLE V"),
@@ -75,7 +76,7 @@ SEC7 = [
      "the sweep resolves. Fig. 6 plots it. That is a strong result, and it is also a "
      "warning sign."),
     ("body",
-     "The second is the redundancy documented in Section III-C. CICIoV2024 contains "
+     "The second is the redundancy documented in Section IV-C. CICIoV2024 contains "
      "3,588 distinct identifier-and-payload tuples in 1,408,219 frames, its attack "
      "classes are drawn from as few as two or three distinct tuples, and no attack "
      "identifier appears anywhere in the benign capture. A detector facing that "
@@ -101,8 +102,9 @@ SEC7 = [
      "from whichever normal validation frames the split assigns, and on a capture "
      "whose payload vocabulary is as small as this one a different draw of validation "
      "blocks shifts the tail of the normal score distribution appreciably. The "
-     "detection rate is insensitive to that shift because, as Fig. 6 shows, the "
-     "attack and normal score distributions do not overlap at all here. On a harder "
+     "detection rate is insensitive to that shift because the attack and normal score "
+     "distributions on this capture do not overlap at all, as the unit area under "
+     "the curve in Fig. 6 reflects. On a harder "
      "capture the same sensitivity would move the detection rate as well, which is "
      "the reason the false-alarm figures in this paper should be read as an operating "
      "region rather than as a single number."),
@@ -120,7 +122,12 @@ SEC7 = [
      "that drives the residual far outside its normal range is separable by a gate "
      "calibrated at a 1% false-alarm rate."),
     ("body",
-     "A third capture supports the same reading. SynCAN [21], the synthetic benchmark "
+     "Fig. 3 explains the difference between the captures. It places each arbitration "
+     "identifier at the ratio of its mean residual under attack to its mean residual "
+     "on normal traffic, and only an attack that moves that ratio well away from one "
+     "is separable by a gate calibrated on normal traffic."),
+    ("body",
+     "A third capture supports the same reading. SynCAN [19], the synthetic benchmark "
      "released with CANet, consists entirely of signal-space manipulations that hold a "
      "signal at a constant valid value, drift it slowly, replay it or suppress it. "
      "Converted to this schema and run under the identical protocol, the gate detects "
@@ -184,9 +191,10 @@ SEC7 = [
      "result. On normal GEM-CAN test traffic the proposed model raises false alarms on "
      "2.26% of frames, against 0.03% to 0.31% for the baselines: about 340 false "
      "alarms per 15,063 normal frames. The target rate at calibration is 1%, and the "
-     "realised rate is higher for two reasons: false alarms from the supervised head "
-     "are counted as alarms of the system, and the normal traffic used for validation "
-     "is not the normal traffic used for test."),
+     "realised rate is higher because the threshold is a quantile fitted on normal "
+     "validation frames and then applied to normal test frames taken from a different "
+     "part of the capture. The two are not identically distributed, so the realised "
+     "tail is heavier than the fitted one."),
     ("body",
      "Fig. 6 shows the whole trade-off rather than the single point. On CICIoV2024 "
      "the curve is effectively a step: detection reaches 100% at a false-alarm rate "
@@ -198,7 +206,8 @@ SEC7 = [
      "left for future work rather than estimated here."),
     ("body",
      "The operationally meaningful unit is alarms per unit time. At 2.26%, a bus "
-     "carrying f frames per second produces 0.0226f alarms per second. At any frame "
+     "carrying f frames per second produces 0.0226f alarms per second: on a bus running "
+     "at 1,000 frames per second, roughly 22 false alarms every second. At any frame "
      "rate a production powertrain bus sustains, that is more alarms than an operator "
      "or a downstream controller could triage. We therefore present the gate at this "
      "operating point as a research instrument rather than a deployable alarm. The "
@@ -211,6 +220,27 @@ SEC7 = [
      "GEM-CAN every missed frame of the quarantined class is zero, because the gate "
      "detects all 119; the systematic false negative is steering tampering, which the "
      "gate misses entirely for the reason given in Section VII-E. On CICIoV2024 there are no false negatives at all: every frame of every quarantined class raises an alarm, and the false-alarm rate falls to 0.37%."),
+    ("body",
+     "A reviewer is entitled to ask what the baselines detect when they are allowed "
+     "the same false-alarm budget rather than read at their own argmax, which alarms "
+     "on well under 1% of normal frames. We therefore scored each baseline "
+     "continuously as s = 1 - P(Normal), set its threshold to the quantile of s over "
+     "normal test frames that matches the proposed model\u2019s realised false-alarm "
+     "rate, and read its detection of the quarantined class there. On the CICIoV2024 "
+     "steering-spoofing run, at a matched budget of 0.02%, the CNN baseline rises "
+     "from 0.10% to 100.00% detection, while BiLSTM reaches 0.03% and CNN-BiLSTM "
+     "0.13%. The proposed model is at 100.00% either way."),
+    ("body",
+     "That result is reported because it qualifies the CICIoV2024 comparison rather "
+     "than because it flatters the method. Given a continuous score and a matched "
+     "budget, a plain CNN separates this quarantined class as completely as the gate "
+     "does, which is what the degeneracy of Section IV-C would predict: the attack "
+     "identifiers carry no benign traffic, so even a model with no label for the "
+     "class is confidently non-Normal on those frames. The comparison that the gate "
+     "wins is the one on GEM-CAN, where the quarantined attack rides on an identifier "
+     "that also carries legitimate traffic. The same matched-budget analysis on "
+     "GEM-CAN requires the raw capture, which we did not have when preparing this "
+     "revision, and the script that performs it is released with the code."),
     ("fig6", None),
     ("fcap",
      "FIGURE 6.  Detection of the quarantined class against false alarms on normal "
@@ -361,7 +391,7 @@ SEC8 = [
      "four-stage quarantine before they could be reported."),
     ("body",
      "The most serious threat to validity is the redundancy of the benchmarks "
-     "themselves, quantified in Section III-C. When 99.9% of a capture’s frames are "
+     "themselves, quantified in Section IV-C. When 99.9% of a capture’s frames are "
      "byte-identical to another frame and the whole release holds 3,588 distinct "
      "identifier-payload tuples, a frame-level score close to 1.000 is substantially "
      "a measurement of the benchmark. This affects every detector evaluated on these "
@@ -392,9 +422,11 @@ SEC9 = [
      "The same four models separate by more than 74 percentage points when one attack "
      "class is quarantined from the label space, from the digital twin's history and "
      "from the anomaly threshold's calibration set. The digital-twin residual gate, "
-     "calibrated on normal traffic alone, raises an alarm on every held-out frame of "
-     "the quarantined class at a 2.26% false-positive rate, where the best supervised "
-     "baseline reaches 25.21%. The mechanism has a well-defined boundary and we have "
+     "calibrated on normal traffic alone, detects 100% of the held-out frames of the "
+     "quarantined class, against 25.21% for the best supervised baseline; the cost of "
+     "that detection is a false-positive rate of 2.26% on normal traffic, against "
+     "0.03% to 0.31% for those baselines. The mechanism has a well-defined boundary "
+     "and we have "
      "measured it rather than asserted it: detection rests on the attack being "
      "anomalous in the payload, and an attack whose forged values fall within the "
      "learnt-normal range is not detected. Evaluation on a second real capture, "
