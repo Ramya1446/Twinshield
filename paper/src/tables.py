@@ -20,46 +20,46 @@ def dataset_chars():
          ["Data length code", "recorded", "absent; fixed at 8"],
          ["Volumetric attack", "DoS on ID 00000000", "DoS on one ID"],
          ["Spoofing attacks", "brake, steering", "gas, RPM, speed, steering"],
-         ["ID-only accuracy", "98.9%", "100.0% (macro-F1 1.000)"]],
+         ["ID-only accuracy", "98.90%", "100.00% (macro-F1 100.00%)"]],
         W3)
 
 def gem_closed():
     return table(
         ["Model", "CAN ID included", "CAN ID excluded"],
-        [["CNN", "0.9968", "0.9914"],
-         ["BiLSTM", "0.9948", "0.9895"],
-         ["CNN-BiLSTM", "0.9979", "0.9914"],
-         ["GRU Digital Twin + CNN-BiLSTM", "0.9989", "0.9979"],
-         ["TwinShield-Fusion", "0.9979", "0.9979"]],
+        [["CNN", "99.68", "99.14"],
+         ["BiLSTM", "99.48", "98.95"],
+         ["CNN-BiLSTM", "99.79", "99.14"],
+         ["GRU Digital Twin + CNN-BiLSTM", "99.89", "99.79"],
+         ["TwinShield-Fusion", "99.79", "99.79"]],
         W3b, bold_rows=(4,))
 
 def gem_abl():
     return table(
         ["Configuration", "CAN ID incl.", "CAN ID excl."],
-        [["CNN-BiLSTM", "0.9979", "0.9914"],
-         ["+ digital twin (scalar)", "0.9958", "0.9965"],
-         ["+ residual vector", "0.9989", "0.9979"],
-         ["+ adaptive fusion", "0.9979", "0.9979"]],
+        [["CNN-BiLSTM", "99.79", "99.14"],
+         ["+ digital twin (scalar)", "99.58", "99.65"],
+         ["+ residual vector", "99.89", "99.79"],
+         ["+ adaptive fusion", "99.79", "99.79"]],
         W3b)
 
 def gem_zd():
     return table(
-        ["Model", "Detected", "False alarms", "Known macro-F1"],
-        [["CNN", "0.84%", "0.03%", "0.6667"],
-         ["BiLSTM", "0.00%", "0.08%", "0.7607"],
-         ["CNN-BiLSTM", "25.21%", "0.31%", "0.7787"],
-         ["TwinShield-Fusion", "100.00%", "2.26%", "0.7829"]],
+        ["Model", "Detected", "False alarms", "Known macro-F1 (%)"],
+        [["CNN", "0.84%", "0.03%", "66.67"],
+         ["BiLSTM", "0.00%", "0.08%", "76.07"],
+         ["CNN-BiLSTM", "25.21%", "0.31%", "77.87"],
+         ["TwinShield-Fusion", "100.00%", "2.26%", "78.29"]],
         W4, bold_rows=(3,))
 
 
 def cic_closed():
     return table(
         ["Model", "CAN ID included", "CAN ID excluded"],
-        [["CNN", "1.0000", "0.9989"],
-         ["BiLSTM", "1.0000", "0.9985"],
-         ["CNN-BiLSTM", "1.0000", "0.9992"],
-         ["GRU Digital Twin + CNN-BiLSTM", "1.0000", "1.0000"],
-         ["TwinShield-Fusion", "1.0000", "0.9999"]],
+        [["CNN", "100.00", "99.89"],
+         ["BiLSTM", "100.00", "99.85"],
+         ["CNN-BiLSTM", "100.00", "99.92"],
+         ["GRU Digital Twin + CNN-BiLSTM", "100.00", "100.00"],
+         ["TwinShield-Fusion", "100.00", "99.99"]],
         W3b, bold_rows=(3, 4))
 
 

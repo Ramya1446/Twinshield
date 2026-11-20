@@ -61,8 +61,7 @@ SEC5 = [
     ("eq", "r_t = | p_t − p̂_t |     (1)"),
     ("body",
      "taken element-wise, so r_t is an eight-dimensional vector with one component per "
-     "payload byte. On GEM-CAN the twin reaches a mean absolute error of 0.041 in the "
-     "units it optimises, or 10.52 on the 0-255 byte scale, measured on held-out "
+     "payload byte. On GEM-CAN the twin reaches a mean absolute error of 0.04 in the units it optimises, or 10.52 on the 0-255 byte scale, measured on held-out "
      "normal frames. That is not a small error, and it does not need to be: detection "
      "rests not on a residual of zero but on a residual that is reliably different "
      "between normal and tampered traffic on the same identifier. CAN payloads "
@@ -124,8 +123,7 @@ SEC5 = [
      "The attention-weighted fusion is described here for completeness because it is "
      "part of the implementation, but it is not claimed as a source of the results. "
      "The ablation of Section VII-G measures its contribution directly and finds it to "
-     "be nil in both input variants, 0.9979 to 0.9979 with the identifier and 0.9979 "
-     "to 0.9979 without it, and the decomposition of Section VII-A shows that it "
+     "be nil in both input variants, 99.79% to 99.79% with the identifier and 99.79% to 99.79% without it, and the decomposition of Section VII-A shows that it "
      "contributes none of the quarantined-class detection either. The component this "
      "paper claims is the residual gate of Section V-D; readers reproducing the "
      "method should expect the residual, not the attention layer, to carry the "

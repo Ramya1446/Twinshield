@@ -7,22 +7,20 @@ SEC7 = [
     ("body",
      "Table IV gives closed-set macro-F1 for every model on the shared held-out test "
      "split, with and without the arbitration identifier as an input. With the "
-     "identifier included, the four architectures span 0.0031 macro-F1 and all five "
-     "rows span 0.0041. Neither number is evidence that one architecture is better "
+     "identifier included, the four architectures span 0.31 macro-F1 points and all five rows span 0.41 points. Neither number is evidence that one architecture is better "
      "than another; both are evidence that the benchmark has stopped measuring "
-     "architecture. A lookup table on the identifier alone reaches 98.9% accuracy on "
+     "architecture. A lookup table on the identifier alone reaches 98.90% accuracy on "
      "this capture, so there is very little label information left for a sequence "
      "model to add."),
     ("tlabel", "TABLE IV"),
-    ("tcap", "Closed-set macro-F1 on the shared GEM-CAN test split"),
+    ("tcap", "Closed-set macro-F1 (%) on the shared GEM-CAN test split"),
     ("table", "GEM_CLOSED"),
     ("body",
      "Removing the identifier is more informative. There the digital-twin residual "
-     "lifts the CNN-BiLSTM backbone from 0.9914 to 0.9979 macro-F1. That gain should "
+     "lifts the CNN-BiLSTM backbone from 99.14% to 99.79% macro-F1. That gain should "
      "be read against the support behind it: macro-F1 is weighted heavily by the two "
      "tampering classes, which contain 119 and 118 test frames, so a single frame "
-     "changing class moves a tampering F1 by about 0.008 and macro-F1 by about 0.002. "
-     "A difference of 0.0065 is therefore of the order of three frames. We report it "
+     "changing class moves a tampering F1 by about 0.80 points and macro-F1 by about 0.20 points. A difference of 0.65 points is therefore of the order of three frames. We report it "
      "as a consistent direction, not as a precisely resolved quantity."),
     ("body",
      "The result that separates the models is the open-set one. Table VI reports the "
@@ -33,7 +31,7 @@ SEC7 = [
      "The known-class macro-F1 column confirms that the proposed model has not bought "
      "that detection by degrading on the classes it kept."),
     ("tlabel", "TABLE V"),
-    ("tcap", "Ablation on the same CNN-BiLSTM backbone, GEM-CAN (macro-F1)"),
+    ("tcap", "Ablation on the same CNN-BiLSTM backbone, GEM-CAN (macro-F1, %)"),
     ("table", "GEM_ABL"),
     ("tlabel", "TABLE VI"),
     ("tcap", "Leave-one-attack-out on GEM-CAN: brake tampering quarantined from every "
@@ -58,12 +56,12 @@ SEC7 = [
      "baselines cannot even do that."),
     ("sub", "B.  PERFORMANCE ON THE CICIoV2024 TEST SET"),
     ("body",
-     "The second capture asks whether the result survives a change of vehicle, of attack family and of recording conditions. Table VII gives closed-set macro-F1. With the arbitration identifier available every model scores 1.0000, and that is not a result about models: on this capture the identifier alone is a perfect classifier, because not one of the attack identifiers appears anywhere in the 1,223,737 benign frames of the release. The informative column is therefore the one with the identifier removed, and there the digital twin lifts the CNN-BiLSTM backbone from 0.9992 to a perfect 1.0000, with per-class F1 of 1.0000 on every class. The twin also fits this vehicle far more closely than the GEM e6, reaching a mean absolute error of 1.88 bytes on 26,880 held-out normal frames against 10.52 on GEM-CAN."),
+     "The second capture asks whether the result survives a change of vehicle, of attack family and of recording conditions. Table VII gives closed-set macro-F1. With the arbitration identifier available every model scores 100.00%, and that is not a result about models: on this capture the identifier alone is a perfect classifier, because not one of the attack identifiers appears anywhere in the 1,223,737 benign frames of the release. The informative column is therefore the one with the identifier removed, and there the digital twin lifts the CNN-BiLSTM backbone from 99.92% to a perfect 100.00%, with per-class F1 of 100.00% on every class. The twin also fits this vehicle far more closely than the GEM e6, reaching a mean absolute error of 1.88 bytes on 26,880 held-out normal frames against 10.52 on GEM-CAN."),
     ("tlabel", "TABLE VII"),
-    ("tcap", "Closed-set macro-F1 on the CICIoV2024 test split"),
+    ("tcap", "Closed-set macro-F1 (%) on the CICIoV2024 test split"),
     ("table", "CIC_CLOSED"),
     ("body",
-     "Table VIII repeats the leave-one-attack-out protocol, once for each of the three attack slots. TwinShield-Fusion raises an alarm on 100.00% of the held-out frames in all three runs, at a false-positive rate of 0.37% on normal traffic, while the three supervised baselines reach 0.00%, 35.71% and 0.16% at best. Known-class macro-F1 remains 1.0000 in every run, so the detection is not bought by degrading on the classes that were retained. The margin is wide rather than marginal: against a gate threshold of z = 4.18, the mean standardised residual of the held-out class is 109 for DoS, 104 for powertrain spoofing and 152 for steering spoofing, and the per-frame view carries the whole of each decision."),
+     "Table VIII repeats the leave-one-attack-out protocol, once for each of the three attack slots. TwinShield-Fusion raises an alarm on 100.00% of the held-out frames in all three runs, at a false-positive rate of 0.37% on normal traffic, while the three supervised baselines reach 0.00%, 35.71% and 0.16% at best. Known-class macro-F1 remains 100.00% in every run, so the detection is not bought by degrading on the classes that were retained. The margin is wide rather than marginal: against a gate threshold of z = 4.18, the mean standardised residual of the held-out class is 109 for DoS, 104 for powertrain spoofing and 152 for steering spoofing, and the per-frame view carries the whole of each decision."),
     ("tlabel", "TABLE VIII"),
     ("tcap", "Leave-one-attack-out on CICIoV2024: each attack slot quarantined from "
              "every training stage in turn"),
@@ -71,8 +69,7 @@ SEC7 = [
     ("body",
      "Two qualifications belong with that table. The first is that the separation is "
      "complete over the whole threshold range, not only at the operating point: the "
-     "area under the detection-against-false-alarm curve is 1.000 for all three "
-     "classes, and 100% detection is still reached at the smallest false-alarm rate "
+     "area under the detection-against-false-alarm curve is 1.00 for all three classes, and 100% detection is still reached at the smallest false-alarm rate "
      "the sweep resolves. Fig. 6 plots it. That is a strong result, and it is also a "
      "warning sign."),
     ("body",
@@ -91,8 +88,7 @@ SEC7 = [
      "To put an uncertainty on those figures rather than relying on a single seeded "
      "run, the steering-spoofing quarantine was repeated with four random seeds. "
      "Detection is perfectly stable: 100.00% on every seed, with a standard deviation "
-     "of zero, as are the known-class macro-F1 of 1.0000 and the area under the curve "
-     "of 1.000. The false-alarm rate is not stable. Across the four seeds it takes "
+     "of zero, as are the known-class macro-F1 of 100.00% and the area under the curve of 1.00. The false-alarm rate is not stable. Across the four seeds it takes "
      "the values 0.37%, 0.35%, 0.55% and 0.02%, a mean of 0.32% with a standard "
      "deviation of 0.22, so the operating point moves by more than an order of "
      "magnitude while the detection rate does not move at all."),
@@ -140,16 +136,14 @@ SEC7 = [
     ("sub", "D.  COMPARISON WITH BASELINE MODELS"),
     ("body",
      "Fig. 4 places the same four models under the two protocols. Under the closed-set "
-     "protocol they are indistinguishable, separated by 0.0031 macro-F1. Under the "
+     "protocol they are indistinguishable, separated by 0.31 macro-F1 points. Under the "
      "leave-one-attack-out protocol on GEM-CAN they are separated by more than 74 "
      "percentage points. The comparison is the central argument of this paper: a "
-     "benchmark on which four architectures agree to three decimal places is not "
-     "measuring the property that matters, and changing the question rather than the "
+     "benchmark on which four architectures agree to within a third of a percentage point is not measuring the property that matters, and changing the question rather than the "
      "model is what makes the difference visible."),
     ("fig3", None),
     ("fcap",
-     "FIGURE 4.  The same four models under two protocols on GEM-CAN. Closed-set "
-     "macro-F1 separates them by 0.0031; detection of a quarantined attack class "
+     "FIGURE 4.  The same four models under two protocols on GEM-CAN. Closed-set macro-F1 separates them by 0.31 points; detection of a quarantined attack class "
      "separates them by more than 74 percentage points."),
     ("body",
      "The ordering of the four models is preserved on CICIoV2024, which matters more "
@@ -198,16 +192,13 @@ SEC7 = [
     ("body",
      "Fig. 6 shows the whole trade-off rather than the single point. On CICIoV2024 "
      "the curve is effectively a step: detection reaches 100% at a false-alarm rate "
-     "below the sweep resolution and stays there, with an area under the curve of "
-     "1.000 for all three quarantined classes, so the operating point reported in "
+     "below the sweep resolution and stays there, with an area under the curve of 1.00 for all three quarantined classes, so the operating point reported in "
      "Table VIII is conservative and could be lowered by an order of magnitude at no "
      "cost in detection. The GEM-CAN run available to us recorded the operating point "
      "only and not the full sweep, so the corresponding curve for that capture is "
      "left for future work rather than estimated here."),
     ("body",
-     "The operationally meaningful unit is alarms per unit time. At 2.26%, a bus "
-     "carrying f frames per second produces 0.0226f alarms per second: on a bus running "
-     "at 1,000 frames per second, roughly 22 false alarms every second. At any frame "
+     "The operationally meaningful unit is alarms per unit time. At 2.26%, a bus produces 2.26 false alarms for every hundred frames it carries: on a bus running at 1,000 frames per second, roughly 22 false alarms every second. At any frame "
      "rate a production powertrain bus sustains, that is more alarms than an operator "
      "or a downstream controller could triage. We therefore present the gate at this "
      "operating point as a research instrument rather than a deployable alarm. The "
@@ -245,19 +236,14 @@ SEC7 = [
     ("fcap",
      "FIGURE 6.  Detection of the quarantined class against false alarms on normal "
      "traffic, as the gate threshold is swept, on CICIoV2024. The three curves "
-     "coincide and are drawn with different dash patterns for that reason; the area "
-     "under each is 1.000. The circle marks the operating point reported in Table "
+     "coincide and are drawn with different dash patterns for that reason; the area under each is 1.00. The circle marks the operating point reported in Table "
      "VIII, which is conservative: detection is already complete at a far smaller "
      "false-alarm rate."),
     ("sub", "G.  ABLATION STUDY"),
     ("body",
      "Table V isolates the contribution of each component on the same CNN-BiLSTM "
      "backbone. The ladder is not monotonic with the identifier included, and we read "
-     "it as it stands: macro-F1 falls from 0.9979 to 0.9958 when the scalar twin "
-     "output is added, and only the full per-byte residual recovers and surpasses the "
-     "backbone at 0.9989. With the identifier excluded the ladder does rise at each "
-     "step, from 0.9914 to 0.9965 to 0.9979. In both variants adaptive fusion adds "
-     "nothing beyond the residual, 0.9979 to 0.9979."),
+     "it as it stands: macro-F1 falls from 99.79% to 99.58% when the scalar twin output is added, and only the full per-byte residual recovers and surpasses the backbone at 99.89%. With the identifier excluded the ladder does rise at each step, from 99.14% to 99.65% to 99.79%. In both variants adaptive fusion adds nothing beyond the residual, 99.79% to 99.79%."),
     ("body",
      "The conclusion we draw is narrower than the architecture would invite. In this "
      "experiment the gain lies in the residual, not in the attention layer, and we "
@@ -303,9 +289,8 @@ SEC8 = [
     ("sub", "A.  KEY FINDINGS"),
     ("body",
      "Three findings follow from the experiments. First, closed-set accuracy has "
-     "stopped discriminating between CAN intrusion detectors on these benchmarks: four "
-     "architectures agree to within 0.0031 macro-F1, and a lookup table on the "
-     "arbitration identifier alone reaches 98.9% accuracy on GEM-CAN. Reporting "
+     "stopped discriminating between CAN intrusion detectors on these benchmarks: four architectures agree to within 0.31 macro-F1 points, and a lookup table on the "
+     "arbitration identifier alone reaches 98.90% accuracy on GEM-CAN. Reporting "
      "accuracy as the headline on such a benchmark measures the dataset, not the "
      "model."),
     ("body",
@@ -378,7 +363,7 @@ SEC8 = [
      "comparison is unaffected, but both should temper any reading of the absolute "
      "closed-set figures. All figures come from a single seeded run: the 74-point gap "
      "that carries the argument is far larger than any plausible seed variance, while "
-     "the differences of a few thousandths in Tables IV and V are not, and we claim no "
+     "the differences of a few tenths of a point in Tables IV and V are not, and we claim no "
      "ordering among the four architectures. The CICIoV2024 quarantine was repeated "
      "over four seeds, which bounds that concern there but not on GEM-CAN, where a "
      "repeat would require access to the raw capture. The baseline set contains three "
@@ -393,7 +378,7 @@ SEC8 = [
      "The most serious threat to validity is the redundancy of the benchmarks "
      "themselves, quantified in Section IV-C. When 99.9% of a capture’s frames are "
      "byte-identical to another frame and the whole release holds 3,588 distinct "
-     "identifier-payload tuples, a frame-level score close to 1.000 is substantially "
+     "identifier-payload tuples, a frame-level score close to 100% is substantially "
      "a measurement of the benchmark. This affects every detector evaluated on these "
      "captures, ours included, and it is the reason we lead with the "
      "leave-one-attack-out alarm rate rather than with closed-set accuracy, and the "
@@ -414,10 +399,9 @@ SEC9 = [
     ("sec", "IX.  CONCLUSION AND FUTURE WORK"),
     ("body",
      "Closed-set evaluation has told the CAN intrusion detection literature that the "
-     "problem is nearly solved. The four architectures compared here sit within 0.0031 "
-     "macro-F1 of one another on the dataset studied, which says more about the "
+     "problem is nearly solved. The four architectures compared here sit within 0.31 macro-F1 points of one another on the dataset studied, which says more about the "
      "benchmark than about the models, and a lookup table on the arbitration "
-     "identifier alone reaches 98.9% accuracy on the same capture."),
+     "identifier alone reaches 98.90% accuracy on the same capture."),
     ("body",
      "The same four models separate by more than 74 percentage points when one attack "
      "class is quarantined from the label space, from the digital twin's history and "
